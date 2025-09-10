@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+# Common Aliases (shared between bash and zsh)
+
+# Navigation & Files
+alias l="ls"                    # List files in current directory
+alias ll="ls -al"               # Long listing including hidden files
+alias o="open ."                # Open current directory in Finder
+alias mkcd='function _mkcd(){ mkdir -p "$1" && cd "$1"; }; _mkcd'
+
+# Python
+alias py="python3"
+
+# Git Shortcuts
+alias gaa='git add .'
+alias gcm='git commit -m'
+alias gpsh='git push'
+alias gpshom='git push origin main'
+alias gss='git status -s'
+alias gs='echo ""; echo "*********************************************"; echo -e "   DO NOT FORGET TO PULL BEFORE COMMITTING"; echo "*********************************************"; echo ""; git status'
+
+# Updates / Maintenance (assumes scripts present in repo/bin later)
+alias brewup='brew update && brew upgrade && brew cleanup'
+
+# Safety: confirm before overwrite/removal recursively
+alias cp='cp -i'
+alias mv='mv -i'
+alias rm='rm -i'
+
+# IP & Network Helpers (fast check)
+alias myip='curl -s https://ifconfig.me'
+
+# Reload shell
+alias reload='exec $SHELL'
+
+# VS Code quick open current dir
+alias c='code .'
+
+# End of .aliases

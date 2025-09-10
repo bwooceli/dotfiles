@@ -1,0 +1,14 @@
+[user]
+	# Set your identity (script will skip if you already have a global ~/.gitconfig)
+	name = YOUR_NAME
+	email = YOUR_EMAIL@example.com
+[core]
+	editor = vim
+[init]
+	defaultBranch = main
+[pull]
+	rebase = false
+[fetch]
+	prune = true
+[color]
+	ui = auto
