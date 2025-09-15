@@ -29,7 +29,7 @@ done
 
 # VS Code settings location symlinked
 VCODE_SETTINGS="$HOME/Library/Application Support/Code/User/settings.json"
-check "VS Code settings symlink" "[ -L '$VCODE_SETTINGS' ]"
+check "VS Code settings symlink" "[ -L \"$VCODE_SETTINGS\" ]"
 
 # Zsh plugins available
 check "zsh-autosuggestions plugin" "[ -f $(brew --prefix 2>/dev/null)/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]"

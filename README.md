@@ -1,178 +1,70 @@
-# Dotfiles Bootstrap
+# Dotfiles Bootstrap (macOS / Apple Silicon)
 
-Apple Silicon focused, opinionated setup for a fresh macOS environment. Installs core tools, links dotfiles via symlinks, applies selected macOS defaults, and configures shell + VS Code.
+Minimal, opinionated Mac setup: install core tools, link dotfiles, apply a few sane defaults, configure shell + VS Code.
 
-> NOTE: This repository contains placeholder tokens: `YOUR_GITHUB_USERNAME`, `YOUR_NAME`, `YOUR_EMAIL@example.com`.
-> Run `./personalize.sh` to replace them with your real identity before sharing or committing.
+Placeholder tokens present until you personalize: `YOUR_GITHUB_USERNAME`, `YOUR_NAME`, `YOUR_EMAIL@example.com`.
 
-## Quickstart (Review First!)
+## TL;DR – Fresh Mac
+1. (Optional) Personalize repo placeholders:
+   ```bash
+   git clone https://github.com/YOUR_GITHUB_USERNAME/dotfiles.git ~/dotfiles && cd ~/dotfiles
+   ./personalize.sh --github myuser --name "My Name" --email me@example.com
+   ```
+2. Run setup (review first):
+   ```bash
+   ./my_mac_setup.sh
+   ```
+3. Open a new terminal (loads zsh + brew env) and launch VS Code once.
+4. (Optional) Apply macOS tweaks later:
+   ```bash
+   ./new_mac_defaults.sh apply
+   ```
 
-Clone and run locally (safer than piping remote script):
-
+## Or: One-Liner (clone + personalize + run)
+Fetches the latest `bootstrap.sh`, clones this repo (if missing), optionally prompts for your GitHub/name/email to replace placeholders, then launches the main setup.
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/dotfiles.git ~/dotfiles
-cd ~/dotfiles
-./my_mac_setup.sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/bwooceli/dotfiles/main/bootstrap.sh)"
 ```
-
-### One-Liner (Fast Start / Fresh Mac)
-If you really want a single command (e.g., brand new Mac without git cloned repo yet):
+Append flags after the closing quote to skip pieces passed through to `my_mac_setup.sh` (see Advanced doc):
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/dotfiles/main/bootstrap.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/bwooceli/dotfiles/main/bootstrap.sh)" --no-defaults --no-vscode
 ```
-You can pass flags through:
+Disable the personalization prompt (if you want to do it manually later):
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/dotfiles/main/bootstrap.sh)" --no-defaults --no-vscode
+DOTFILES_NO_PERSONALIZE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/bwooceli/dotfiles/main/bootstrap.sh)"
 ```
-The one-liner will:
-1. Trigger Xcode CLT install if missing (and stop for you to finish it)
-2. Download repo (git if available; tarball fallback if not)
-3. Install Homebrew if missing
-4. Run `my_mac_setup.sh` with any extra flags you supplied
 
-### Making Scripts Executable
-If you clone manually, ensure scripts are executable (usually preserved):
+## What You Get (Default Run)
+- Xcode CLT (only if missing)
+- Homebrew + packages from `Brewfile`
+- Oh My Zsh (if missing)
+- Symlinks: `.zshrc`, `.aliases`, `.gitignore`, VS Code settings, optional `.gitconfig`
+- Optional macOS defaults (if not skipped)
+
+Re-running is safe: linking + installs are idempotent; existing real files are timestamp‑backed up before linking.
+
+## Quick Checks
 ```bash
-chmod +x my_mac_setup.sh new_mac_defaults.sh doctor.sh bootstrap.sh
+./doctor.sh        # verifies brew, oh-my-zsh, symlinks, VS Code settings
 ```
 
-Optional flags:
-```
-  --no-brew       Skip Homebrew + bundle
-  --no-dotfiles   Skip linking dotfiles
-  --no-omz        Skip Oh My Zsh install
-  --no-vscode     Skip VS Code settings link
-  --no-defaults   Skip macOS defaults script
-  --dry-run       Show actions only
-  --force         Overwrite existing backups silently
-```
-
-Re-run safe: script is idempotent. Backups are created with a timestamp if original non-symlink files exist.
-
-## What Gets Installed
-
-1. Xcode Command Line Tools (if missing)
-2. Homebrew (if missing)
-3. Brew packages & casks from `Brewfile`
-4. Oh My Zsh (non-interactive) if absent
-5. Symlinks to: `.zshrc`, `.aliases`, `.gitignore`, VS Code settings, (optional) `.gitconfig`
-6. Optional macOS defaults via `new_mac_defaults.sh`
-
-## macOS Defaults
-
-Apply all defaults:
-```bash
-./new_mac_defaults.sh apply
-```
-Dry run:
-```bash
-./new_mac_defaults.sh apply --dry-run
-```
-List groups:
-```bash
-./new_mac_defaults.sh list
-```
-
-## Doctor (Health Check)
-```bash
-./doctor.sh
-```
-
-## Testing Changes (Without Touching Your Real Home)
-
-You can simulate a "fresh" environment locally:
-
-```bash
-# Create a sandbox directory to act as a fake home
-mkdir -p /tmp/dotfiles-sandbox
-export DOTFILES_TARGET_HOME=/tmp/dotfiles-sandbox
-
-# (Optional) remove any prior state
-rm -rf /tmp/dotfiles-sandbox/*
-
-# Dry run first
-./my_mac_setup.sh --dry-run --no-brew --no-defaults
-
-# Execute selected parts (skip brew for speed, still links into sandbox)
-./my_mac_setup.sh --no-brew --no-defaults --no-omz
-
-# Inspect results
-tree /tmp/dotfiles-sandbox -L 2
-
-# Run doctor against sandbox by temporarily adjusting HOME
-HOME=$DOTFILES_TARGET_HOME ./doctor.sh
-```
-
-Notes:
-* Brew & defaults still operate on the real system; use `--no-brew --no-defaults` for safe sandbox tests.
-* The script now honors `DOTFILES_TARGET_HOME` for linking dotfiles & writing `.zprofile`.
-* For full isolation, test in a macOS VM (UTM/VirtualBuddy) or a fresh user account.
-
-## Updating
+## Update Later
 ```bash
 git -C ~/dotfiles pull
 brew bundle --file ~/dotfiles/Brewfile
 ```
 
-## Git Identity
-If you already have a global `~/.gitconfig`, the setup script will not overwrite it. Edit manually or remove then re-run if you want the repo version.
+## Customize Identity Later
+If you had an existing `~/.gitconfig` it is not replaced. To apply the repo version, move or remove yours then re-run setup.
 
-To replace placeholders in this repo:
+Replace placeholders anytime:
 ```bash
+cd ~/dotfiles
 ./personalize.sh --github myuser --name "My Name" --email me@example.com
 ```
-Dry run first:
-```bash
-./personalize.sh --github myuser --name "My Name" --email me@example.com --dry-run
-```
 
-## VS Code Settings
-Linked into the user settings location. Modify the repo file to version-control changes.
-
-## Security & Trust
-Review scripts before execution. Remote install scripts (Homebrew, Oh My Zsh) are fetched via HTTPS; consider pinning revisions if supply-chain risk is a concern.
-
-## Uninstall / Rollback (Manual)
-Remove symlinks and restore backups created alongside (e.g. `.zshrc.backup.<timestamp>`). Some macOS defaults may require manual reset via System Settings.
-
-## Roadmap / Ideas
-* Split Brewfile into core vs personal layers
-* Add CI (shellcheck + brew bundle check)
-* Template-based `.gitconfig` with on-demand prompt
+## Need More Detail?
+Flags, sandbox testing, granular defaults groups, roadmap, rollback steps, and security notes live in: **`ADVANCED.md`**.
 
 ---
-
-## Main Settings to Change
-  
-Settings
- * Finder Settings (not system)
-    * Enable path view
-    * Keep folders on top
- * Keyboard
-    * Key repeat rate = Fast
-    * Delay until repeat = 4 (Med-Short)
-    * Enable Keyboard Navigation
-    * Input Sources -> disable smart quotes
-    * Swap the shortcut for "Screenshot to File" and "Screenshot to Clipboard"
- * Desktop and Dock
-    * Change "Minimize Using" to "Scale"
-    * Enable Minimize windows into application icon
-    * Disabled "Recommended and Recent" apps in docker
-    * Trackpad
-      * Enable Tap to Click
-      * More Gestures -> Enable App Expose with three finger down-swipe
-
-
-# Other Apps installed outside of Brew
- * Microsoft 365
- * DaVinci Resolve
- * SoftTube Central / iLok (vsts)
-
-## Capturing Additional Defaults (Manual Technique)
-```
-cp -r /Library/Preferences before
-# change a setting
-cp -r /Library/Preferences after
-diff -ur before after | less
-```
-Look for relevant domain keys to add to `new_mac_defaults.sh`.
+For a deeper dive: open `ADVANCED.md`. Otherwise you're done.

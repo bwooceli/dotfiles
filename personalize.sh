@@ -80,15 +80,27 @@ printf '  %s\n' "${CANDIDATES[@]}"
 
 do_replace() {
   local file="$1"
-  $BACKUP && cp "$file" "$file.bak" || true
-  # macOS sed -i requires an arg ('' for none)
+  local will_change=false
   for i in "${!PLACEHOLDERS[@]}"; do
     local ph="${PLACEHOLDERS[$i]}"; local rep="${REPLACEMENTS[$i]}"
     [[ -z "$rep" ]] && continue
     if grep -q "$ph" "$file"; then
-      sed -i '' "s|$ph|$rep|g" "$file"
+      will_change=true; break
     fi
   done
+  if $will_change; then
+    $BACKUP && cp "$file" "$file.bak" || true
+    for i in "${!PLACEHOLDERS[@]}"; do
+      local ph="${PLACEHOLDERS[$i]}"; local rep="${REPLACEMENTS[$i]}"
+      [[ -z "$rep" ]] && continue
+      if grep -q "$ph" "$file"; then
+        sed -i '' "s|$ph|$rep|g" "$file"
+      fi
+    done
+    echo "Updated: $file"
+  else
+    echo "No placeholder change: $file (skipped)"
+  fi
 }
 
 if $DRY_RUN; then
