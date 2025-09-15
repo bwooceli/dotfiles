@@ -35,6 +35,11 @@ check "VS Code settings symlink" "[ -L '$VCODE_SETTINGS' ]"
 check "zsh-autosuggestions plugin" "[ -f $(brew --prefix 2>/dev/null)/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]"
 check "zsh-syntax-highlighting plugin" "[ -f $(brew --prefix 2>/dev/null)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]"
 
+# Placeholder advisory
+if grep -R "YOUR_GITHUB_USERNAME\|YOUR_NAME\|YOUR_EMAIL@example.com" . >/dev/null 2>&1; then
+  echo "[WARN] Placeholder identity strings still present. Run ./personalize.sh to replace them." >&2
+fi
+
 echo "\nSummary: $pass passed, $fail failed"
 if (( fail > 0 )); then
   exit 1

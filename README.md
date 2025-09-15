@@ -2,14 +2,38 @@
 
 Apple Silicon focused, opinionated setup for a fresh macOS environment. Installs core tools, links dotfiles via symlinks, applies selected macOS defaults, and configures shell + VS Code.
 
+> NOTE: This repository contains placeholder tokens: `YOUR_GITHUB_USERNAME`, `YOUR_NAME`, `YOUR_EMAIL@example.com`.
+> Run `./personalize.sh` to replace them with your real identity before sharing or committing.
+
 ## Quickstart (Review First!)
 
 Clone and run locally (safer than piping remote script):
 
 ```bash
-git clone https://github.com/andrewawilley/dotfiles.git ~/dotfiles
+git clone https://github.com/YOUR_GITHUB_USERNAME/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./my_mac_setup.sh
+```
+
+### One-Liner (Fast Start / Fresh Mac)
+If you really want a single command (e.g., brand new Mac without git cloned repo yet):
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/dotfiles/main/bootstrap.sh)"
+```
+You can pass flags through:
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/dotfiles/main/bootstrap.sh)" --no-defaults --no-vscode
+```
+The one-liner will:
+1. Trigger Xcode CLT install if missing (and stop for you to finish it)
+2. Download repo (git if available; tarball fallback if not)
+3. Install Homebrew if missing
+4. Run `my_mac_setup.sh` with any extra flags you supplied
+
+### Making Scripts Executable
+If you clone manually, ensure scripts are executable (usually preserved):
+```bash
+chmod +x my_mac_setup.sh new_mac_defaults.sh doctor.sh bootstrap.sh
 ```
 
 Optional flags:
@@ -93,6 +117,15 @@ brew bundle --file ~/dotfiles/Brewfile
 ## Git Identity
 If you already have a global `~/.gitconfig`, the setup script will not overwrite it. Edit manually or remove then re-run if you want the repo version.
 
+To replace placeholders in this repo:
+```bash
+./personalize.sh --github myuser --name "My Name" --email me@example.com
+```
+Dry run first:
+```bash
+./personalize.sh --github myuser --name "My Name" --email me@example.com --dry-run
+```
+
 ## VS Code Settings
 Linked into the user settings location. Modify the repo file to version-control changes.
 
@@ -109,12 +142,10 @@ Remove symlinks and restore backups created alongside (e.g. `.zshrc.backup.<time
 
 ---
 
-## Personal Preferences Reference
+## Main Settings to Change
   
-# Summary of my personal preferences
-
 Settings
- * Finder
+ * Finder Settings (not system)
     * Enable path view
     * Keep folders on top
  * Keyboard
@@ -130,8 +161,7 @@ Settings
     * Trackpad
       * Enable Tap to Click
       * More Gestures -> Enable App Expose with three finger down-swipe
- * Strechly
-    * 15 minutes between micro-breaks
+
 
 # Other Apps installed outside of Brew
  * Microsoft 365
