@@ -68,7 +68,11 @@ PLACEHOLDERS=("YOUR_GITHUB_USERNAME" "YOUR_NAME" "YOUR_EMAIL@example.com")
 REPLACEMENTS=("$GITHUB_USERNAME" "$REAL_NAME" "$REAL_EMAIL")
 
 # Collect candidate files (only text files in repo root depth 2) containing placeholders
-mapfile -t CANDIDATES < <(grep -RIl --exclude-dir .git -e 'YOUR_GITHUB_USERNAME' -e 'YOUR_NAME' -e 'YOUR_EMAIL@example.com' . || true)
+# (while-read loop instead of mapfile: stock macOS bash is 3.2)
+CANDIDATES=()
+while IFS= read -r line; do
+  CANDIDATES+=("$line")
+done < <(grep -RIl --exclude-dir .git -e 'YOUR_GITHUB_USERNAME' -e 'YOUR_NAME' -e 'YOUR_EMAIL@example.com' . || true)
 
 if [[ ${#CANDIDATES[@]} -eq 0 ]]; then
   echo "No files with placeholders found.";

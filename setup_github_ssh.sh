@@ -137,7 +137,7 @@ fi
 
 if $DO_REMOTE_PROMPT && [[ -t 0 ]]; then
     read -rp "📂 Update an existing repo remote from HTTPS to SSH? (y/N): " UPDATE_REPO
-    if [[ ${UPDATE_REPO,,} == y ]]; then
+    if [[ $UPDATE_REPO == [yY] ]]; then
         read -rp "📂 Path to repo: " REPO_PATH
         if [[ -d "$REPO_PATH/.git" ]]; then
             pushd "$REPO_PATH" >/dev/null || exit 1

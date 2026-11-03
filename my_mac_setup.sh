@@ -49,42 +49,85 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+# Pass commands as separate arguments (no eval), so nothing is expanded early.
 run() {
+    local IFS=' ' # print "$*" space-separated despite the script-wide IFS
     if $DRY_RUN; then
         echo "[dry-run] $*"
     else
         echo "+ $*"
-        eval "$@"
+        "$@"
     fi
+}
+
+# run_installer <name> <shell> <url> [VAR=value ...]
+# Downloads the installer only when actually running (not during --dry-run).
+run_installer() {
+    local name="$1" shell="$2" url="$3"; shift 3
+    if $DRY_RUN; then
+        echo "[dry-run] download and run $name installer from $url ${*:-}"
+        return 0
+    fi
+    local script
+    script="$(curl -fsSL "$url")"
+    echo "+ running $name installer"
+    env "$@" "$shell" -c "$script"
+}
+
+find_brew() {
+    command -v brew 2>/dev/null && return 0
+    local p
+    for p in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+        if [ -x "$p" ]; then echo "$p"; return 0; fi
+    done
+    return 1
 }
 
 ensure_xcode() {
     if ! xcode-select -p &>/dev/null; then
         echo "Installing Xcode command line tools..."
-        run "xcode-select --install || true" # GUI interaction required
+        run xcode-select --install || true # GUI interaction required
+        if ! $DRY_RUN; then
+            echo "Re-run this script after the Xcode command line tools finish installing."
+            exit 0
+        fi
     else
         echo "Xcode command line tools already installed"
     fi
 }
 
 install_homebrew() {
-    if command -v brew >/dev/null 2>&1; then
-        echo "Homebrew already installed"
+    local brew_bin
+    if brew_bin="$(find_brew)"; then
+        echo "Homebrew already installed ($brew_bin)"
     else
         echo "Installing Homebrew..."
-        run "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+        run_installer Homebrew /bin/bash https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+        if ! brew_bin="$(find_brew)"; then
+            if $DRY_RUN; then
+                echo "[dry-run] would add brew shellenv to $TARGET_HOME/.zprofile"
+                return 0
+            fi
+            echo "Homebrew install finished but brew was not found" >&2
+            exit 1
+        fi
     fi
-    # Apple Silicon specific path
+    # Persist brew on PATH for future login shells (literal line, expanded at login)
     if ! grep -q 'brew shellenv' "$TARGET_HOME/.zprofile" 2>/dev/null; then
-    run "(echo; echo 'eval \"$(/opt/homebrew/bin/brew shellenv)\"') >> $TARGET_HOME/.zprofile"
+        if $DRY_RUN; then
+            echo "[dry-run] append 'eval \"\$($brew_bin shellenv)\"' to $TARGET_HOME/.zprofile"
+        else
+            # shellcheck disable=SC2016
+            printf '\neval "$(%s shellenv)"\n' "$brew_bin" >> "$TARGET_HOME/.zprofile"
+        fi
     fi
-    # shellcheck disable=SC2046
-    eval "$($(command -v brew) shellenv)"
+    # And for the rest of this script
+    eval "$("$brew_bin" shellenv)"
 }
 
 brew_bundle() {
     echo "Running brew bundle (Brewfile)..."
-    run "brew bundle --file=$REPO_ROOT/Brewfile"
+    run brew bundle --file="$REPO_ROOT/Brewfile"
 }
 
 install_oh_my_zsh() {
@@ -92,7 +135,8 @@ install_oh_my_zsh() {
         echo "Oh My Zsh already installed"
     else
         echo "Installing Oh My Zsh (non-interactive)..."
-        run "RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\""
+        run_installer "Oh My Zsh" /bin/sh https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh \
+            RUNZSH=no CHSH=no KEEP_ZSHRC=yes
     fi
 }
 
@@ -100,16 +144,13 @@ backup_then_link() {
     local src="$1"; shift
     local dest="$1"; shift
     if [ -e "$dest" ] && [ ! -L "$dest" ]; then
-        local backup="${dest}.backup.$(date +%Y%m%d%H%M%S)"
-        if $FORCE; then
-            run "mv '$dest' '$backup'"
-        else
-            echo "Backing up existing $dest -> $backup"
-            run "mv '$dest' '$backup'"
-        fi
+        local backup
+        backup="${dest}.backup.$(date +%Y%m%d%H%M%S)"
+        echo "Backing up existing $dest -> $backup"
+        run mv "$dest" "$backup"
     fi
     # Always link (force to update if changed)
-    run "ln -snf '$src' '$dest'"
+    run ln -snf "$src" "$dest"
 }
 
 link_dotfiles() {
@@ -127,7 +168,7 @@ link_dotfiles() {
     # VS Code settings target
     if $DO_VSCODE; then
     local VSC_TARGET="$TARGET_HOME/Library/Application Support/Code/User/settings.json"
-        mkdir -p "$(dirname "$VSC_TARGET")"
+        run mkdir -p "$(dirname "$VSC_TARGET")"
         backup_then_link "$REPO_ROOT/vs_code.user.settings.json" "$VSC_TARGET"
     fi
 }
@@ -136,7 +177,10 @@ apply_defaults() {
     if $DO_DEFAULTS; then
         if [ -x "$REPO_ROOT/new_mac_defaults.sh" ]; then
             echo "Applying macOS defaults (apply)..."
-            run "$REPO_ROOT/new_mac_defaults.sh" apply || echo "Defaults script returned non-zero (review logs)"
+            local defaults_args=(apply)
+            if $DRY_RUN; then defaults_args+=(--dry-run); fi
+            # Run even in dry-run: the defaults script has its own dry-run mode
+            "$REPO_ROOT/new_mac_defaults.sh" "${defaults_args[@]}" || echo "Defaults script returned non-zero (review logs)"
         else
             echo "Defaults script not executable or missing"
         fi
@@ -145,7 +189,8 @@ apply_defaults() {
 
 post_install_notes() {
     cat <<EOF
-\nBootstrap complete.
+
+Bootstrap complete.
 Next steps (manual suggestions):
     - Launch VS Code once to finalize extension installs.
     - Review backed up originals (*.backup.YYYYMMDDHHMMSS) if any.
