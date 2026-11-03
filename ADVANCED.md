@@ -35,11 +35,13 @@ List groups:
 ```bash
 ./new_mac_defaults.sh list
 ```
-Apply only one group (example):
+Apply only some groups (example):
 ```bash
-./new_mac_defaults.sh apply dock
+./new_mac_defaults.sh apply dock finder
 ```
-Groups implemented: finder, textedit, keyboard, dock, trackpad.
+Groups implemented: finder, textedit, keyboard, typing, dialogs, dock, trackpad, screenshots, activitymonitor.
+
+Each setting is read before it is written, so re-runs only touch values that differ, and an app is restarted only if one of its settings changed. The dry run lists each pending change as `current -> new`.
 
 ## Doctor (Health Check)
 ```bash
