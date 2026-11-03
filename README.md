@@ -2,6 +2,24 @@
 
 Minimal, opinionated Mac setup: install core tools, link dotfiles, apply a few sane defaults, configure shell + VS Code.
 
+## My Settings at a Glance
+What I change on every new Mac. **Auto** = handled by `new_mac_defaults.sh` (group in brackets); **Manual** = still set by hand in System Settings.
+
+| Area | Setting | How |
+|------|---------|-----|
+| Finder | Show path bar; keep folders on top | Auto `[finder]` |
+| Keyboard | Key repeat rate: Fast | Auto `[keyboard]` |
+| Keyboard | Delay until repeat: 4th notch (med-short) | Auto `[keyboard]`, but the script sets the shortest delay (15) — adjust if you prefer the 4th notch |
+| Keyboard | Enable keyboard navigation (Tab between controls) | Manual |
+| Keyboard | Disable smart quotes (and dashes, auto-correct) | Auto `[typing]` |
+| Keyboard | Swap shortcuts for "Screenshot to File" and "Screenshot to Clipboard" | Manual (Keyboard → Keyboard Shortcuts → Screenshots) |
+| Desktop & Dock | Minimize using Scale; minimize into app icon; hide recent/suggested apps | Auto `[dock]` |
+| Trackpad | Tap to click; App Exposé on three-finger swipe down | Auto `[trackpad]` |
+
+Also applied automatically: plain-text TextEdit, all file extensions shown, no `.DS_Store` on network/USB drives, expanded save/print dialogs, screenshots to `~/Screenshots`, Activity Monitor showing all processes. Run `./new_mac_defaults.sh list` for the full list.
+
+**Apps installed outside Homebrew:** Microsoft 365, DaVinci Resolve, Softube Central / iLok (plugins).
+
 Placeholder tokens present until you personalize: `YOUR_GITHUB_USERNAME`, `YOUR_NAME`, `YOUR_EMAIL@example.com`.
 
 ## TL;DR – Fresh Mac
