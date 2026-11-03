@@ -49,7 +49,15 @@ defaults write com.apple.screencapture disable-shadow -bool true && killall Syst
 ```
 
 ### What I install
-- **Via Homebrew** (see [`Brewfile`](Brewfile)): iTerm2, VS Code, Sublime Text, Obsidian, Firefox, Chrome, Edge, Discord, VLC, OBS, Ollama, plus zsh plugins (autosuggestions, syntax highlighting) and Oh My Zsh.
+Everything below comes from Homebrew (full list in [`Brewfile`](Brewfile)) unless noted.
+- **Mac utilities:** Rectangle (window snapping), Raycast (Spotlight replacement), Hidden Bar (tidy menu bar), Tailscale
+- **Terminal & editors:** iTerm2, VS Code, Sublime Text, Neovim, Obsidian, plus Oh My Zsh with zsh-autosuggestions and syntax highlighting
+- **Browsers:** Arc, Firefox, Chrome, Edge, Tor Browser
+- **Dev:** `gh`, `uv`, pyenv, rustup, Docker Desktop, DBeaver, Android Studio, gcloud CLI
+- **AI:** Claude, ChatGPT, Ollama
+- **Everyday:** Discord, Telegram, Zoom, Spotify, VLC
+- **Media & home:** OBS, HandBrake, Plex, Jellyfin, Philips Hue Sync
+- **Audio & desk gear:** Reaper, Focusrite Control, Mixing Station, Elgato Stream Deck, Logi Options+
 - **Outside Homebrew:** Microsoft 365, DaVinci Resolve, Softube Central / iLok (audio plugins).
 
 Placeholder tokens present until you personalize: `YOUR_GITHUB_USERNAME`, `YOUR_NAME`, `YOUR_EMAIL@example.com`.
