@@ -1,11 +1,11 @@
 # Taps
 # ----------------------------------------------------------
-tap "homebrew/cask-versions"
+# (homebrew/bundle and homebrew/services are built into brew now;
+#  homebrew/cask-versions and homebrew/cask-fonts were retired and merged
+#  into homebrew/cask, so fonts are plain `cask "font-..."` entries.)
 tap "FelixKratz/formulae"
-tap "homebrew/cask-fonts"
-tap "homebrew/services"
-tap "buo/cask-upgrade"
-tap "homebrew/bundle"
+tap "buo/cask-upgrade"   # provides `brew cu`
+tap "powershell/tap"
 
 # Formula
 # ----------------------------------------------------------
@@ -34,7 +34,7 @@ cask "visual-studio-code"
 cask "vlc"
 
 # LLM
-cask "ollama"
+cask "ollama-app"
 
 # Me Specific
 cask "elgato-stream-deck"
