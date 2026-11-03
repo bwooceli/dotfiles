@@ -2,23 +2,55 @@
 
 Minimal, opinionated Mac setup: install core tools, link dotfiles, apply a few sane defaults, configure shell + VS Code.
 
-## My Settings at a Glance
-What I change on every new Mac. **Auto** = handled by `new_mac_defaults.sh` (group in brackets); **Manual** = still set by hand in System Settings.
+## What I Change on a New Mac
+A quick reference you can follow **by hand**, no scripts needed. Paths are for current macOS (System Settings). If you do use this repo, `./new_mac_defaults.sh` applies everything tagged with a `[group]`.
 
-| Area | Setting | How |
-|------|---------|-----|
-| Finder | Show path bar; keep folders on top | Auto `[finder]` |
-| Keyboard | Key repeat rate: Fast | Auto `[keyboard]` |
-| Keyboard | Delay until repeat: 4th notch (med-short) | Auto `[keyboard]`, but the script sets the shortest delay (15) — adjust if you prefer the 4th notch |
-| Keyboard | Enable keyboard navigation (Tab between controls) | Manual |
-| Keyboard | Disable smart quotes (and dashes, auto-correct) | Auto `[typing]` |
-| Keyboard | Swap shortcuts for "Screenshot to File" and "Screenshot to Clipboard" | Manual (Keyboard → Keyboard Shortcuts → Screenshots) |
-| Desktop & Dock | Minimize using Scale; minimize into app icon; hide recent/suggested apps | Auto `[dock]` |
-| Trackpad | Tap to click; App Exposé on three-finger swipe down | Auto `[trackpad]` |
+### Finder
+- **Show path bar and status bar** — Finder → View → Show Path Bar / Show Status Bar `[finder]`
+- **Show all filename extensions** — Finder → Settings… → Advanced `[finder]`
+- **Don't warn when changing an extension** — Finder → Settings… → Advanced `[finder]`
+- **Keep folders on top** (when sorting by name) — Finder → Settings… → Advanced `[finder]`
+- **Search the current folder, not the whole Mac** — Finder → Settings… → Advanced → "When performing a search" `[finder]`
+- **Show the Library folder** — Go → Home, then View → Show View Options → Show Library Folder `[finder]`
 
-Also applied automatically: plain-text TextEdit, all file extensions shown, no `.DS_Store` on network/USB drives, expanded save/print dialogs, screenshots to `~/Screenshots`, Activity Monitor showing all processes. Run `./new_mac_defaults.sh list` for the full list.
+### Keyboard & typing
+- **Key repeat rate: Fast; Delay until repeat: short** — System Settings → Keyboard `[keyboard]`
+- **Keyboard navigation on** (Tab moves between buttons in dialogs) — System Settings → Keyboard → Keyboard navigation
+- **Turn off auto-correct, smart quotes/dashes, double-space period** — System Settings → Keyboard → Text Input → Input Sources → Edit… `[typing]`. Essential if you ever type code or commands.
 
-**Apps installed outside Homebrew:** Microsoft 365, DaVinci Resolve, Softube Central / iLok (plugins).
+### Screenshots
+- **Swap the "save to file" and "copy to clipboard" shortcuts** so ⇧⌘4 copies to the clipboard (paste anywhere) — System Settings → Keyboard → Keyboard Shortcuts… → Screenshots
+- **Save to a `~/Screenshots` folder** instead of the Desktop — press ⇧⌘5 → Options → Save to → Other Location… `[screenshots]`
+- **No drop shadow on window captures** — hold ⌥ while clicking the window, or make it permanent with the Terminal command below `[screenshots]`
+
+### Desktop & Dock
+- **Minimize using Scale effect** (faster than Genie) — System Settings → Desktop & Dock `[dock]`
+- **Minimize windows into application icon** (keeps the Dock tidy) — System Settings → Desktop & Dock `[dock]`
+- **Hide suggested and recent apps in Dock** — System Settings → Desktop & Dock `[dock]`
+
+### Trackpad
+- **Tap to click** — System Settings → Trackpad → Point & Click `[trackpad]`
+- **App Exposé: three-finger swipe down** — System Settings → Trackpad → More Gestures `[trackpad]`
+
+### Apps
+- **TextEdit: plain text by default, UTF-8** — TextEdit → Settings… → New Document → Plain text; Open and Save → encoding UTF-8 `[textedit]`
+- **Activity Monitor: show all processes, sort by CPU** — View → All Processes, then click the "% CPU" column `[activitymonitor]`
+
+### No checkbox for these (Terminal one-liners)
+```bash
+# Don't create .DS_Store files on network shares and USB drives
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+# Open save and print dialogs expanded
+defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
+defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
+# No shadow on window screenshots
+defaults write com.apple.screencapture disable-shadow -bool true && killall SystemUIServer
+```
+
+### What I install
+- **Via Homebrew** (see [`Brewfile`](Brewfile)): iTerm2, VS Code, Sublime Text, Obsidian, Firefox, Chrome, Edge, Discord, VLC, OBS, Ollama, plus zsh plugins (autosuggestions, syntax highlighting) and Oh My Zsh.
+- **Outside Homebrew:** Microsoft 365, DaVinci Resolve, Softube Central / iLok (audio plugins).
 
 Placeholder tokens present until you personalize: `YOUR_GITHUB_USERNAME`, `YOUR_NAME`, `YOUR_EMAIL@example.com`.
 
